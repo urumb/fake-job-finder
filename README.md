@@ -66,7 +66,7 @@ Accuracy alone is misleading on small datasets — confusion matrix and confiden
 - Balance scam vs legit samples
 - Retrain and re-evaluate model
 
-**Status:** ⏳ Upcoming
+**Status:** ✅ Completed
 
 ---
 
@@ -78,7 +78,7 @@ Accuracy alone is misleading on small datasets — confusion matrix and confiden
 - Store full scam content on IPFS
 - Enable public verification of scam reports
 
-**Status:** ⏳ Planned
+**Status:** ⏳ Upcoming
 
 ---
 
@@ -96,13 +96,15 @@ Accuracy alone is misleading on small datasets — confusion matrix and confiden
 
 ## 📌 Current Project Status
 
-```text
-Current Phase: Phase 2 — Model Evaluation & Confidence
+Current Phase: Phase 3 — Data Scaling & Confidence Tuning
 
 Completed:
 - Phase 0: Foundation
 - Phase 1: AI Model Development
-- Phase 2: Evaluation & Confidence Handling
+- Phase 2: Evaluation & Metrics
+- Phase 3: Real-world dataset integration
+- Phase 3.4: Confidence-based decision gating
 
 Next:
-- Phase 3: Train model on real-world Kaggle dataset
+- Phase 4: Blockchain Evidence Ledger
+
