@@ -1,5 +1,6 @@
 import pickle
 from preprocess import clean_text
+from blockchain_writer import write_scam_to_blockchain
 
 # Confidence thresholds
 SCAM_THRESHOLD = 0.80
@@ -18,13 +19,22 @@ def predict_job(text: str):
     prob_legit = probs[0]
     prob_scam = probs[1]
 
+    # decide label first (ML is authoritative)
     if prob_scam >= SCAM_THRESHOLD:
-        return "SCAM", prob_scam
+        label = "SCAM"
+        confidence = prob_scam
+    elif prob_legit >= LEGIT_THRESHOLD:
+        label = "LEGIT"
+        confidence = prob_legit
+    else:
+        label = "UNCERTAIN"
+        confidence = max(prob_legit, prob_scam)
 
-    if prob_legit >= LEGIT_THRESHOLD:
-        return "LEGIT", prob_legit
+    # 🔗 blockchain side-effect (safe, best-effort)
+    # only writes if prob_scam >= 0.80
+    write_scam_to_blockchain(clean, prob_scam)
 
-    return "UNCERTAIN", max(prob_legit, prob_scam)
+    return label, confidence
 
 
 if __name__ == "__main__":

@@ -1,18 +1,23 @@
-// simple deployment script for ScamLedger
-// nothing fancy, just deploy and print the address
-
-import hre from "hardhat";
+// deploy script for ScamLedger
+// simple and clean on purpose
 
 async function main() {
-  const ScamLedger = await hre.ethers.getContractFactory("ScamLedger");
+  // get contract factory
+  const ScamLedger = await ethers.getContractFactory("ScamLedger");
+
+  // deploy contract
   const scamLedger = await ScamLedger.deploy();
 
-  await scamLedger.waitForDeployment();
+  // wait till deployment is mined
+  await scamLedger.deployed();
 
-  console.log("ScamLedger deployed to:", await scamLedger.getAddress());
+  console.log("ScamLedger deployed to:", scamLedger.address);
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+// standard hardhat pattern
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
