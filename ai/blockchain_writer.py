@@ -46,7 +46,7 @@ def generate_evidence_hash(text: str, label: str, prob: float) -> bytes:
 
 def write_scam_to_blockchain(text: str, prob: float):
     if prob < 0.80:
-        return  # hard gate
+        return None  # hard gate
 
     try:
         acct = w3.eth.account.from_key(PRIVATE_KEY)
@@ -72,8 +72,12 @@ def write_scam_to_blockchain(text: str, prob: float):
         signed = acct.sign_transaction(tx)
         tx_hash = w3.eth.send_raw_transaction(signed.rawTransaction)
 
-        print(f"[BLOCKCHAIN] Evidence written: {tx_hash.hex()}")
+        tx_hex = tx_hash.hex()
+        print(f"[BLOCKCHAIN] Evidence written: {tx_hex}")
+
+        return tx_hex
 
     except Exception as e:
         # best-effort only; never break ML
         print(f"[BLOCKCHAIN] write failed (ignored): {e}")
+        return None

@@ -1,13 +1,21 @@
+from cProfile import label
 import pickle
-from preprocess import clean_text
-from blockchain_writer import write_scam_to_blockchain
+from ai.preprocess import clean_text
+from ai.blockchain_writer import write_scam_to_blockchain
+
 
 # Confidence thresholds
 SCAM_THRESHOLD = 0.80
 LEGIT_THRESHOLD = 0.80
 
 # Load trained model and vectorizer
-with open("model.pkl", "rb") as f:
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
+
+with open(MODEL_PATH, "rb") as f:
     model, vectorizer = pickle.load(f)
 
 
@@ -32,9 +40,8 @@ def predict_job(text: str):
 
     # 🔗 blockchain side-effect (safe, best-effort)
     # only writes if prob_scam >= 0.80
-    write_scam_to_blockchain(clean, prob_scam)
-
-    return label, confidence
+    tx_hash = write_scam_to_blockchain(clean, prob_scam)
+    return label, confidence, tx_hash
 
 
 if __name__ == "__main__":
