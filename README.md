@@ -1,231 +1,190 @@
-🛡️ AI Scam Detection + Blockchain Evidence Ledger
+# 🛡️ AI Scam Detection + Blockchain Evidence Ledger
 
-An AI-powered system to detect fake job postings and scam messages using NLP, with confidence-aware decisions and an immutable blockchain-backed evidence ledger, exposed via a production-style REST API.
+A production-style system that detects fake job postings using Machine Learning and records **high-confidence scam evidence immutably on blockchain**, with confidence-aware safety controls.
 
-Built with a strong focus on safety, explainability, auditability, and real-world deployment practices.
+---
 
-🚀 Project Overview
+## 🚀 Project Overview
 
-Online job scams exploit job seekers by:
+Online job scams exploit job seekers by promising easy income, demanding registration fees, or guaranteeing jobs without interviews.  
+This project addresses that problem by building a **safe, explainable, and auditable system** that focuses on correctness and real-world behavior rather than just model accuracy.
 
-Promising unrealistically high salaries
+The system is designed as a **backend-first architecture**, exposing clean APIs that can be consumed by any client or UI.
 
-Asking for “refundable” registration fees
+---
 
-Avoiding formal hiring processes
+## 🧠 Key Features
 
-Using vague job descriptions and urgency tactics
+- 🔍 **ML-based scam detection** using NLP  
+- ⚖️ **Confidence-aware predictions**: `SCAM`, `LEGIT`, `UNCERTAIN`  
+- 🚫 **Uncertain predictions never trigger irreversible actions**  
+- ⛓️ **Blockchain evidence ledger** for high-confidence scams  
+- 📦 **Off-chain content storage** via IPFS  
+- 🌐 **FastAPI backend** acting as an orchestration layer  
+- 🧩 Modular, explainable, and extensible design  
 
-This project aims to:
+---
 
-Automatically detect scam job postings using Machine Learning
+## 🏗️ High-Level Architecture
 
-Make confidence-aware decisions instead of blind predictions
+```text
+Client / API Consumer
+        ↓
+FastAPI Backend
+        ↓
+ML Inference Engine
+        ↓
+Confidence-Based Decision Gating
+        ↓
+Blockchain Evidence Ledger (High-confidence scams only)
+        ↓
+IPFS (Full content storage)
 
-Store tamper-proof scam evidence on blockchain
 
-Expose detection as a clean, production-ready API
+🧩 Project Phases
 
-Enable public verification of reported scams
-
-🎯 Design Philosophy
-
-No irreversible actions without high confidence
-
-Uncertain predictions fail safely
-
-Scam evidence must be immutable
-
-System should be explainable, auditable, and fault-tolerant
-
-ML, API, and Blockchain concerns are cleanly separated
-
-🧠 System Architecture (High Level)
-
-Job Posting Input
-↓
-Text Preprocessing
-↓
-ML Model (TF-IDF + Logistic Regression)
-↓
-Confidence Gating
-
-├─ SCAM (≥ 0.80)
-│ ├─ Blockchain Evidence Ledger (Ethereum Sepolia)
-│ └─ Transaction hash returned via API
-├─ LEGIT (≥ 0.80) → No irreversible action
-└─ UNCERTAIN → Safe exit (no blockchain write)
-
-All logic is exposed through a FastAPI backend.
-
-🧩 Project Phases & Progress
 ✅ Phase 0 — Foundation
 
-Goal: Project clarity & structure
+Problem definition and scope locking
 
-Defined problem statement and scope
+Tech stack selection
 
-Locked tech stack
-
-Designed folder structure
-
-Planned phase-wise roadmap
-
-Status: ✅ Completed
+Phase-wise roadmap planning
 
 ✅ Phase 1 — AI Model Development
 
-Goal: Build a working scam detection model
+Text preprocessing pipeline
 
-Implemented text preprocessing pipeline
+TF-IDF feature extraction
 
-Trained ML model
-(TF-IDF + Logistic Regression)
+Logistic Regression baseline model
 
-Built prediction pipeline
+End-to-end prediction pipeline
 
-Saved reusable trained model (model.pkl)
+✅ Phase 2 — Evaluation & Metrics
 
-Status: ✅ Completed
+Train/test split
 
-✅ Phase 2 — Model Evaluation & Confidence
+Accuracy and confusion matrix
 
-Goal: Understand model behavior and reliability
+Precision and recall analysis
 
-Train–test split evaluation
-
-Accuracy measurement
-
-Confusion matrix analysis
-
-Introduced confidence scores instead of binary decisions
-
-Key Insight:
-Accuracy alone is misleading for fraud detection — confidence matters more.
-
-Status: ✅ Completed
+Understanding false positives vs false negatives
 
 ✅ Phase 3 — Real-World Dataset Scaling
 
-Goal: Improve robustness using real scam data
+Integrated Kaggle Fake Job Postings dataset (~17,880 samples)
 
-Integrated Kaggle Real or Fake Job Posting dataset
+Unified text field from title + description + requirements
 
-Cleaned noisy and inconsistent text
+Class imbalance handling using weighted training
 
-Balanced scam vs legit samples
-
-Retrained and re-evaluated model
-
-Status: ✅ Completed
+Achieved strong scam recall on real-world data
 
 ✅ Phase 3.4 — Confidence-Based Decision Gating
 
-Goal: Prevent dangerous false positives
+Probability-based predictions
 
-Introduced confidence thresholds:
+Strict confidence thresholds:
 
-SCAM ≥ 0.80
+SCAM if P(scam) ≥ 0.80
 
-LEGIT ≥ 0.80
+LEGIT if P(legit) ≥ 0.80
 
-Added UNCERTAIN state for low-confidence predictions
+Otherwise → UNCERTAIN
 
-Ensured no irreversible actions occur for uncertain cases
+Low-confidence predictions are safely ignored
 
-Status: ✅ Completed
+✅ Phase 4 — Blockchain Evidence Ledger
 
-⛓️ Phase 4 — Blockchain Evidence Ledger
+Smart contract for immutable scam logging
 
-Goal: Ensure scam evidence cannot be altered or deleted
+Minimal on-chain storage:
 
-Designed Solidity smart contract
+Content hash
 
-Deployed on Ethereum Sepolia testnet
+IPFS CID
 
-Stores:
+Confidence score
 
-Evidence hash
+Timestamp
 
-Confidence bucket
+Only high-confidence scams are written on-chain
 
-Model version
+✅ Phase 5 — Backend Integration
 
-Blockchain writes triggered only for high-confidence scams
+FastAPI backend with /analyze endpoint
 
-Fail-safe behavior: blockchain failures never break ML flow
+ML inference + confidence gating
 
-Status: ✅ Completed
+Conditional blockchain interaction
 
-🌐 Phase 5 — Backend Integration
+Graceful handling of blockchain failures
 
-Goal: Production-ready, end-to-end system
+📌 Current Project Status
+Status: COMPLETE (Core System)
 
-Built FastAPI backend
+ML:
+- Real-world trained
+- Imbalance-aware
+- Confidence-gated
 
-Exposed /analyze-job REST API
+Blockchain:
+- High-confidence scam evidence ledger
+- Testnet-based deployment
 
-Integrated ML inference pipeline
+Backend:
+- Clean API
+- Safe orchestration layer
 
-Integrated blockchain evidence logging
+UI:
+- Optional (intentionally decoupled)
 
-Returned blockchain transaction hash when available
+🛠️ Tech Stack
 
-Implemented clean service-based architecture
+Language: Python
 
-Full Swagger / OpenAPI support for testing
+Machine Learning / NLP: scikit-learn, TF-IDF
 
-Status: ✅ Completed
+Backend: FastAPI
 
-🧪 API Capabilities
-Endpoint
-POST /analyze-job
+Blockchain: Ethereum testnet (smart contracts)
 
-Input
-{
-  "title": "Work From Home Data Entry",
-  "description": "Earn money from home...",
-  "requirements": "Basic computer skills"
-}
+Storage: IPFS
 
-Output
+Version Control: Git & GitHub
+
+## ⚙️ Setup
+
+Clone the repository and install dependencies:
+
+```bash
+pip install -r requirements.txt
+
+🎯 Design Principles
+
+Safety over blind automation
+
+Confidence before irreversible actions
+
+Minimal on-chain data
+
+Explainable ML decisions
+
+Modular, production-style architecture
+
+📖 Example API Output
 {
   "prediction": "SCAM",
-  "confidence": 0.91,
-  "blockchain_tx": "0xabc123..."
+  "confidence": 0.96,
+  "blockchain_logged": true,
+  "tx_hash": "0xabc123..."
 }
 
 
-blockchain_tx is returned only for high-confidence scams
+UNCERTAIN predictions do not trigger blockchain writes.
 
-null for LEGIT or UNCERTAIN cases
+🧑‍💻 Author Notes
 
-🔐 Security & Safety Notes
-
-.env files are never committed
-
-Private keys stored only in environment variables
-
-Blockchain writes are best-effort and fail-safe
-
-API and ML inference continue even if blockchain RPC fails
-
-No irreversible actions under uncertainty
-
-📌 Current Status
-
-Current Phase: Phase 5 — Backend Integration
-System State: End-to-end ML + API + Blockchain fully operational
-Next (Optional):
-
-IPFS evidence storage
-
-Dockerization
-
-Frontend demo
-
-Deployment
-
-📜 License
-
-This project is for educational and research purposes.
+This project was built incrementally with phase-wise commits to reflect real-world engineering workflows.
+The focus is on correctness, safety, and auditability, not UI polish.

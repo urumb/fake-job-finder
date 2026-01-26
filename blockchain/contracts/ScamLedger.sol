@@ -1,53 +1,72 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-// This contract is used to store proof (hashes) of scam job postings.
-// The AI model runs off-chain and decides if something is a scam.
-// If the confidence is high enough, only then we store the evidence here.
-// Blockchain is just for record-keeping, not decision-making.
+/*
+    ScamLedger — Blockchain Evidence Ledger
+
+    Purpose:
+    - Store immutable proof that a job posting was classified as a scam
+    - AI decision-making happens off-chain
+    - Blockchain is used ONLY for verifiable record-keeping
+
+    Privacy-first design:
+    - No raw job text is stored on-chain
+    - Full text is stored off-chain on IPFS
+    - Only hashes + metadata are recorded on-chain
+*/
 
 contract ScamLedger {
 
-    // This struct holds all info related to one scam record
+    // Represents one immutable scam evidence record
     struct Evidence {
-        bytes32 evidenceHash;     // hash generated off-chain (job text + model output)
-        uint256 timestamp;        // when this evidence was recorded
-        uint8 confidenceBucket;   // 1–4 (higher bucket = higher confidence)
-        string modelVersion;      // which ML model version was used
-        address reporter;         // who submitted this record
+        bytes32 evidenceHash;     // Hash of job text (and optionally model output)
+        string ipfsCid;           // IPFS CID pointing to full off-chain text
+        uint256 timestamp;        // When the evidence was recorded
+        uint8 confidenceBucket;   // 1–4 (higher = more confident)
+        string modelVersion;      // ML model version used
+        address reporter;         // Address that submitted the record
     }
 
-    // Maps evidence hash to stored evidence
+    // Maps evidence hash to its stored record
     mapping(bytes32 => Evidence) private evidenceStore;
 
-    // Used to make sure the same hash is not stored twice
+    // Prevents duplicate entries
     mapping(bytes32 => bool) private evidenceExists;
 
-    // Emitted whenever a new scam record is added
+    // Emitted when a new scam record is stored
     event ScamRecorded(
         bytes32 indexed evidenceHash,
+        string ipfsCid,
         uint256 timestamp,
         uint8 confidenceBucket,
         address indexed reporter
     );
 
-    // Called after the AI system flags a job as a high-confidence scam
+    /*
+        Called only after:
+        - ML model classifies job as SCAM
+        - Confidence threshold is met off-chain
+        - Full text is uploaded to IPFS
+    */
     function recordScamEvidence(
         bytes32 _evidenceHash,
+        string calldata _ipfsCid,
         uint8 _confidenceBucket,
         string calldata _modelVersion
     ) external {
-        // basic checks
+        // Basic validation
         require(_evidenceHash != bytes32(0), "invalid hash");
         require(!evidenceExists[_evidenceHash], "already recorded");
+        require(bytes(_ipfsCid).length > 0, "empty IPFS CID");
         require(
             _confidenceBucket >= 1 && _confidenceBucket <= 4,
             "invalid confidence bucket"
         );
 
-        // create and store the evidence
+        // Store the evidence
         evidenceStore[_evidenceHash] = Evidence({
             evidenceHash: _evidenceHash,
+            ipfsCid: _ipfsCid,
             timestamp: block.timestamp,
             confidenceBucket: _confidenceBucket,
             modelVersion: _modelVersion,
@@ -56,16 +75,17 @@ contract ScamLedger {
 
         evidenceExists[_evidenceHash] = true;
 
-        // emit event so it can be tracked on explorers
+        // Emit event for off-chain indexing & explorers
         emit ScamRecorded(
             _evidenceHash,
+            _ipfsCid,
             block.timestamp,
             _confidenceBucket,
             msg.sender
         );
     }
 
-    // Anyone can read stored evidence using the hash
+    // Public read access using the evidence hash
     function getEvidence(bytes32 _evidenceHash)
         external
         view
